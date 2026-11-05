@@ -1,0 +1,132 @@
+{
+  "entities": {
+    "Challenge": {
+      "title": "Challenge",
+      "description": "Public challenge metadata and questions without answer keys",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the challenge"
+        },
+        "creatorName": {
+          "type": "string",
+          "description": "Display name or nickname of the challenge creator",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "questions": {
+          "type": "array",
+          "description": "List of 5 questions with 4 choices each, containing no correct answer index"
+        },
+        "durationHours": {
+          "type": "integer",
+          "description": "Challenge lifespan in hours (24 or 48)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when challenge was created"
+        },
+        "expiresAt": {
+          "type": "string",
+          "description": "Timestamp when challenge expires"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the challenge: active or expired"
+        },
+        "totalAttempts": {
+          "type": "integer",
+          "description": "Cached count of friend attempts"
+        }
+      },
+      "required": ["id", "creatorName", "questions", "durationHours", "createdAt", "expiresAt", "status"]
+    },
+    "ChallengeSecret": {
+      "title": "ChallengeSecret",
+      "description": "Private secret answer key and creator management token, locked from public read",
+      "type": "object",
+      "properties": {
+        "challengeId": {
+          "type": "string",
+          "description": "Associated challenge ID"
+        },
+        "correctOptionIndices": {
+          "type": "array",
+          "description": "Secret list of zero-indexed correct answers chosen by creator"
+        },
+        "creatorKey": {
+          "type": "string",
+          "description": "Hashed management key for creator dashboard access"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when secret was recorded"
+        }
+      },
+      "required": ["challengeId", "correctOptionIndices", "creatorKey"]
+    },
+    "Attempt": {
+      "title": "Attempt",
+      "description": "Recorded friend quiz submission and scored results",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique submission attempt ID"
+        },
+        "challengeId": {
+          "type": "string",
+          "description": "Reference to the parent challenge"
+        },
+        "friendName": {
+          "type": "string",
+          "description": "Nickname of the friend attempting the challenge",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "score": {
+          "type": "integer",
+          "description": "Calculated score (0 to 5)"
+        },
+        "totalQuestions": {
+          "type": "integer",
+          "description": "Total number of questions evaluated"
+        },
+        "percentage": {
+          "type": "integer",
+          "description": "Percentage score (0 to 100)"
+        },
+        "resultCategory": {
+          "type": "string",
+          "description": "Gen-Z savagery label for the result"
+        },
+        "submittedAt": {
+          "type": "string",
+          "description": "Submission timestamp"
+        }
+      },
+      "required": ["id", "challengeId", "friendName", "score", "totalQuestions", "percentage", "resultCategory", "submittedAt"]
+    }
+  },
+  "firestore": {
+    "/challenges/{challengeId}": {
+      "schema": {
+        "$ref": "#/entities/Challenge"
+      },
+      "description": "Stores publicly readable challenge cards containing questions without answers"
+    },
+    "/challenges/{challengeId}/secret/answers": {
+      "schema": {
+        "$ref": "#/entities/ChallengeSecret"
+      },
+      "description": "Private document storing correct answer keys, forbidden from public reads"
+    },
+    "/challenges/{challengeId}/attempts/{attemptId}": {
+      "schema": {
+        "$ref": "#/entities/Attempt"
+      },
+      "description": "Stores friend quiz submissions and final calculated scores"
+    }
+  }
+}

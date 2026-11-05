@@ -1,0 +1,6 @@
+{
+  "name": "FRND FOBIA",
+  "description": "A viral Gen-Z friendship challenge platform. Test how well your besties really know you with savage, hilarious quiz questions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

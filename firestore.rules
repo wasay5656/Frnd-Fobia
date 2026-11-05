@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation Blueprint for Challenge document
+    function isValidChallenge(data) {
+      return data.keys().hasAll(['id', 'creatorName', 'questions', 'durationHours', 'createdAt', 'expiresAt', 'status'])
+        && data.keys().hasOnly(['id', 'creatorName', 'questions', 'durationHours', 'createdAt', 'expiresAt', 'status', 'totalAttempts'])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 128
+        && data.creatorName is string && data.creatorName.size() >= 1 && data.creatorName.size() <= 50
+        && data.durationHours is int && (data.durationHours == 24 || data.durationHours == 48)
+        && data.questions is list && data.questions.size() == 5
+        && data.status is string && (data.status == 'active' || data.status == 'expired')
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.expiresAt is string && data.expiresAt.size() <= 64;
+    }
+
+    // Validation Blueprint for Friend Attempt document
+    function isValidAttempt(data) {
+      return data.keys().hasAll(['id', 'challengeId', 'friendName', 'score', 'totalQuestions', 'percentage', 'resultCategory', 'submittedAt'])
+        && data.keys().hasOnly(['id', 'challengeId', 'friendName', 'score', 'totalQuestions', 'percentage', 'resultCategory', 'submittedAt'])
+        && data.id is string && data.id.size() > 0 && data.id.size() <= 128
+        && data.challengeId is string && data.challengeId.size() > 0 && data.challengeId.size() <= 128
+        && data.friendName is string && data.friendName.size() >= 1 && data.friendName.size() <= 50
+        && data.score is int && data.score >= 0 && data.score <= 5
+        && data.totalQuestions is int && data.totalQuestions == 5
+        && data.percentage is int && data.percentage >= 0 && data.percentage <= 100
+        && data.resultCategory is string && data.resultCategory.size() <= 100
+        && data.submittedAt is string && data.submittedAt.size() <= 64;
+    }
+
+    // Connection test document
+    match /test/connection {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Challenge documents
+    match /challenges/{challengeId} {
+      // Allow individual challenge fetch by ID
+      allow get: if isValidId(challengeId);
+      // Deny blanket collection listing to prevent scraping
+      allow list: if false;
+      // Creation validated against schema
+      allow create: if isValidId(challengeId)
+                    && isValidChallenge(incoming())
+                    && incoming().id == challengeId;
+      // Updates allowed ONLY for atomic attempts incrementing
+      allow update: if isValidId(challengeId)
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['totalAttempts'])
+                    && incoming().totalAttempts is int
+                    && incoming().id == existing().id;
+      // Deletions forbidden
+      allow delete: if false;
+
+      // SECRET SUBCOLLECTION: Answers and creator token
+      // STRICT ZERO-TRUST: Absolutely NO direct client reads or client writes
+      match /secret/{secretDoc} {
+        allow read, write: if false;
+      }
+
+      // ATTEMPTS SUBCOLLECTION: Friend submissions & scoreboard
+      match /attempts/{attemptId} {
+        // Individual attempt reading and listing for the specific challenge
+        allow get: if isValidId(challengeId) && isValidId(attemptId);
+        allow list: if isValidId(challengeId);
+        // Attempt creation validated against schema
+        allow create: if isValidId(challengeId)
+                      && isValidId(attemptId)
+                      && isValidAttempt(incoming())
+                      && incoming().challengeId == challengeId
+                      && incoming().id == attemptId;
+        // Submissions are strictly immutable
+        allow update, delete: if false;
+      }
+    }
+  }
+}

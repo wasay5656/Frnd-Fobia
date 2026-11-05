@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+    --color-lime: #ccff00;
+    --color-hotpink: #ff1493;
+    --color-cobalt: #1d4ed8;
+    --color-dark: #0a0a0a;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #080808;
+    color: #f8fafc;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Y2K & Neo-Brutalist Sticker and Shadow Utilities */
+.neo-box-lime {
+  background-color: #0d0d0d;
+  border: 2px solid #ccff00;
+  box-shadow: 4px 4px 0px 0px #ccff00;
+}
+
+.neo-box-pink {
+  background-color: #0d0d0d;
+  border: 2px solid #ff1493;
+  box-shadow: 4px 4px 0px 0px #ff1493;
+}
+
+.neo-box-cobalt {
+  background-color: #0d0d0d;
+  border: 2px solid #3b82f6;
+  box-shadow: 4px 4px 0px 0px #2563eb;
+}
+
+.neo-box-white {
+  background-color: #121212;
+  border: 2px solid #ffffff;
+  box-shadow: 4px 4px 0px 0px #ffffff;
+}
+
+.neo-btn-lime {
+  background-color: #ccff00;
+  color: #000000;
+  font-weight: 800;
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: all 0.15s ease;
+}
+.neo-btn-lime:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+.neo-btn-lime:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.neo-btn-pink {
+  background-color: #ff1493;
+  color: #ffffff;
+  font-weight: 800;
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: all 0.15s ease;
+}
+.neo-btn-pink:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+.neo-btn-pink:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.neo-btn-cobalt {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 800;
+  border: 2px solid #000000;
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: all 0.15s ease;
+}
+.neo-btn-cobalt:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px #000000;
+}
+.neo-btn-cobalt:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+/* Y2K Grid background */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ccff00;
+}
